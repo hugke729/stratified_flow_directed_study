@@ -18,7 +18,7 @@
  diffKhS=1.E3,
  diffKzS=1.E-5,
  f0=0.E-4,
- beta=0.02E-11,
+ beta=0.0E-11,
  tAlpha=2.E-4,
  sBeta =0.E-4,
  gravity=9.81,
