@@ -43,7 +43,7 @@ for regime in ['sub', 'super', 'complete_block', 'partial_block_w_lee',
     alpha = 2E-4
     delta_temp = gprime/(g*alpha)
 
-    # Smoothed heaviside function
+    # Smoothed heaviside function for T
     T_ref = np.ones_like(dz)*delta_temp
     T_ref[zc < -(z_tot - d0)] = 0
     T_ref = gaussian_filter1d(T_ref, 0.5)
@@ -56,7 +56,10 @@ for regime in ['sub', 'super', 'complete_block', 'partial_block_w_lee',
 
     for regime, (h0, Fr) in h0_Fr.items():
         obstacle = h0*d0*np.exp(-(xc - x_centre)**2/(20e3)**2) - z_tot
+
         U_in = Fr*np.sqrt(gprime*d0)*np.ones(nz)
+        U_in[zc > -(z_tot - d0)] = 0
+        U_in = gaussian_filter1d(U_in, 0.5)
 
         T0 = T_ref[np.newaxis, :]*np.ones((nx, nz))
         U0 = U_in[np.newaxis, :]*np.ones((nx, nz))
