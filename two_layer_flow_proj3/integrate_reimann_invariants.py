@@ -9,9 +9,9 @@ def interp(x, y):
     return interp1d(x, y, fill_value='extrapolate')
 
 
-def starting_interface(x, d_10, A, w):
+def starting_interface(x, A, w):
     """Smoothed tophat centred about 0 with amplitude A and width w"""
-    interface = d_10*np.ones_like(x)
+    interface = np.zeros_like(x)
     interface[np.logical_and(x > -w/2, x < w/2)] += A
     interface = gaussian_filter1d(interface, sigma=3)
     return interface
@@ -68,14 +68,14 @@ if __name__ == '__main__':
     # Constants/initial values
     g = 0.1  # reduced gravity
     D = 1  # Total depth
-    d_10 = 0.19  # Depth of bottom layer far away
+    d_10 = 0.2  # Depth of bottom layer far away
     d_20 = D - d_10  # Depth of top layer far away
     A = 0.02
 
     # Preallocate output and fill zeroth time step
     eta_mat = np.empty((Nt + 1, Nx))
     v_mat = np.empty((Nt + 1, Nx))
-    eta_mat[0] = starting_interface(x, d_10, A, w=3)
+    eta_mat[0] = starting_interface(x, A, w=3)
     v_mat[0] = np.zeros_like(x)
 
     for i, t in enumerate(t, start=1):
@@ -83,9 +83,9 @@ if __name__ == '__main__':
         # Values from previous time step
         eta_im1 = eta_mat[i-1]
         v_im1 = v_mat[i-1]
-        R_plus_i, R_minus_i = calc_R(eta_im1, v_im1)
-        R_plus = interp(x, R_plus_i)
-        R_minus = interp(x, R_minus_i)
+        R_plus_im1, R_minus_im1 = calc_R(eta_im1, v_im1)
+        R_plus = interp(x, R_plus_im1)
+        R_minus = interp(x, R_minus_im1)
 
         # eta and v as functions of x
         eta_f = interp(x, eta_im1)
@@ -97,10 +97,10 @@ if __name__ == '__main__':
         x2 = x - c_minus*delta_t
 
         # Calculate Riemann invariants
-        R_plus_i = R_plus(x1)
-        R_minus_i = R_minus(x2)
+        R_plus_x1 = R_plus(x1)
+        R_minus_x2 = R_minus(x2)
 
-        eta_i, v_i = solve_for_eta_v(R_plus_i, R_minus_i)
+        eta_i, v_i = solve_for_eta_v(R_plus_x1, R_minus_x2)
 
         # Save current time step
         eta_mat[i] = eta_i
@@ -111,10 +111,10 @@ fig, ax = plt.subplots()
 ax.set(ylim=(0, 1))
 
 step = 10
-line, = ax.plot(x, eta_mat[0])
+line, = ax.plot(x, eta_mat[0] + d_10)
 
 
 def animate(i):
-    line.set_ydata(eta_mat[i*step])
+    line.set_ydata(eta_mat[i*step] + d_10)
 
 anim = FuncAnimation(fig, animate, frames=Nt//step, interval=100)
