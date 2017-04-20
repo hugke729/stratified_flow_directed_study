@@ -1,0 +1,26 @@
+# Open-boundaries
+ &OBCS_PARM01
+ OB_Iwest=1*1,
+ OB_Ieast=1*-1,
+ OB_Jnorth=100*0,
+ OB_Jsouth=100*0,
+ useOBCSsponge=.TRUE.,
+ OBEuFile='U_in.bin',
+ OBWuFile='U_in.bin',
+ OBEtFile='TE.bin',
+ OBWtFile='TW.bin',
+ useOBCSprescribe=.TRUE.,
+ /
+
+# Orlanski parameters
+ &OBCS_PARM02
+/
+
+# Sponge layer parameters
+ &OBCS_PARM03
+ Urelaxobcsinner=1000.,
+ Urelaxobcsbound=100.,
+ Vrelaxobcsinner=1000.0,
+ Vrelaxobcsbound=100.0,
+ spongeThickness=10,
+ /
